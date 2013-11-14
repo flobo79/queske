@@ -1,0 +1,229 @@
+<style>
+
+  #questions ul, #questions li,
+  #templates ul,  #templates li {
+    margin:0;
+    padding:0;
+    list-style: none;
+  }
+
+  #questions input, #questions textarea {
+    width:95%;
+  }
+
+  #questions>li {
+    display:none;
+    border:1px solid #FFF;
+    padding:10px;
+  }
+
+  #questions>li:hover {
+
+  }
+
+  li.selected a {
+    background-color: #CCC !important;
+  }
+
+  .ask {
+    display: none;
+  }
+
+
+
+
+   .delete {
+       display:none;
+   }
+</style>
+
+<div class="row">
+    
+    <h1><?php echo $this->survey->title; ?></h1>
+    
+    <div class="span5">
+        
+        
+
+        
+        <br>
+        
+        <div id="counter"> </div>
+        
+        <ul id="questions" class="questions">
+
+          <li class="intro"><?php echo nl2br($this->survey->intro) ?></li>
+          <!-- HERE GOES THE RENDERED SURVEY -->
+        </ul>
+        
+        
+        <div class="controls">
+          <ul class="pager">
+            <li data-action-click="prev"><a href="#">Vorherige</a></li>
+            <li data-action-click="next"><a href="#">Nächste</a></li>
+          </ul>
+        </div>
+        
+      </div> 
+      
+      
+      <div class="span4 offset2 hide">
+
+          <?php include(dirname(__FILE__)."/_templates.phtml") ?>
+
+        </div>
+
+        
+      
+  </div>
+
+
+        <script type="text/javascript">
+            var speed = 300;
+            var questions = {};
+            var current = 0;
+            
+            function next(e) {
+                e.preventDefault();
+                Hash.go('page/'+(Number(current)+1));
+                return false;
+            }
+
+            function prev(e)  {
+                e.preventDefault();
+                Hash.go('page/'+(Number(current)-1));
+                return false;
+            }
+
+            function page(page) {
+
+                if (page > questions.length) {
+                    $('#questions>li').fadeOut();
+                    $('#final').fadeIn();
+
+                } else {
+
+                    if(current != page) {
+                        $('#questions>li').fadeOut();
+                        setTimeout(function () {
+                            $('#questions>li:nth-child('+page+')').fadeIn();
+                        }, speed+10);
+                    }
+                }
+
+                current = page;
+
+                updatePager();
+            }
+
+
+            function updatePager() {
+                if(current == 1) {
+                    $($('ul.pager>li')[0]).hide();
+                    $('ul.pager>li:nth-child(2) a').html('Los gehts!');
+
+                } else if(current >= questions.length) {
+                    $('ul.pager>li').hide();
+                } else {
+                    $('ul.pager>li').show();
+                    $('ul.pager>li:nth-child(2) a').html('Nächste');
+                }
+            }
+
+
+            function init() {
+                //hide all question pages
+                $('#questions>li').css({opacity:0});
+
+                questions = JSON.parse('<?php 
+
+
+
+                $list = array();
+                foreach($this->survey->getQuestions() as $q) {
+                  $list[] = $q->getData();
+                }
+                echo json_encode($list) ?>');
+                
+                
+                // fetch all question types
+                var templates = [];
+                $('#templates>li').each(function() {
+                  templates[this.className] = this;
+                });
+                
+                
+                // for all questions create html and add data
+                $(questions).each(function() {
+                  var q = $(templates[this.type]).clone();
+                  
+                  for(e in this) {
+                    q.find('.'+e).html(this[e]);
+                  };
+                  
+                  $('#questions').append(q[0]);
+                });
+
+
+                // active dragging
+                $('#templates').find('li').draggable({
+                    connectToSortable: '#questions',
+                    helper: 'clone',
+                    revert: 'invalid'
+                });
+                
+                
+                $('.rating .pagination li').bind('click', function (e) {
+                  $(this).parent().find('li').removeClass('selected');
+                  $(this).addClass('selected');
+                });
+                
+                
+                
+                /** helper to traverse questions object */
+                function $q(id) {
+                  var q = false;
+                   $(questions).each(function() {
+                     for(e in this) {
+                       if(e == 'id' && this[e] == id) {
+                         q = this;
+                         return this;
+                       }
+                     };
+                   });
+                   
+                   return q;
+                }
+
+                //Hash.pushState(true);
+                Hash.on('page/([0-9]+)$', {
+                    yep: function (path, parts) {
+                        page(parts[1]);
+                    },
+                    nop: function() {
+                        page(1);
+                    }},
+                'Page $1');
+
+
+
+                function save() {
+                  $.post('/surveys/answer', {questions: questions, title: 'TITLE', intro: "INTRO", id:'id'});
+                }
+
+
+                $('body').click(function (e) {
+                    var closest = $(e.target).closest('[data-action-click]')[0];
+                    if(typeof closest != 'undefined') {
+                        window[$(closest).attr('data-action-click')](e);
+                    }
+
+                });
+            }
+
+
+
+
+
+        </script>
+

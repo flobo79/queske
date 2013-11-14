@@ -1,0 +1,15 @@
+<div id="index_login">
+	<h2>Login</h2>
+	
+	<div >
+		<form action="" method="post">
+        <label for="login[login]">Benutzername:</label><input type="text" name="login[login]"  id="login[login]" value="" /><br>
+        <label for="login[password]">Password:</label> <input type="password" name="login[password]" id="login[password]" autocomplete="false" value="" /><br>
+        <input type="submit" value="login" class="btn"/>
+    </form>
+		<?php if($this->error) { ?>
+		<div class="error"><?php echo $this->__str("Error").": ".$this->__str($this->error); ?></div>
+		<?php } ?>
+	</div>
+</div>
+

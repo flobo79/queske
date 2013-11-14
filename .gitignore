@@ -1,0 +1,6 @@
+app/vendor
+app/config.php
+app/composer.lock
+.idea/scopes/scope_settings.xml
+
+.idea/workspace.xml

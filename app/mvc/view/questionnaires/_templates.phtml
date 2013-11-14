@@ -1,0 +1,59 @@
+
+<ul id="templates">
+
+    <li class="rating" data-model-type="rating" data-entity="question">
+        <div class="delete">X</div>
+
+        <div class="question" data-type="textarea" data-field="question">Frage-Text</div>
+
+        <div class="pagination pagination-small">
+            <ul>
+                <li><a href="">1</a></li>
+                <li><a href="">2</a></li>
+                <li><a href="">3</a></li>
+                <li><a href="">4</a></li>
+                <li><a href="">5</a></li>
+                <li><a href="">6</a></li>
+                <li><a href="">7</a></li>
+                <li><a href="">8</a></li>
+                <li><a href="">9</a></li>
+                <li><a href="">10</a></li>
+            </ul>
+        </div>
+
+        <div class="question2" data-type="textarea" data-field="question2">Rückfrage-Text</div>
+
+        <br>
+        <textarea name="q1[advice]"></textarea>
+        <span class="id" style="display:none;" data-field="id"></span>
+        <span><?php echo $this->__str('Kategorie:') ?></span>
+        <select name="category_id" >
+            <option>allgemein</option>
+            <?php
+            foreach($this->categories as $c) { ?>
+                <option value="<?php $c->id ?>"><?php echo $c->title ?></option>
+            <?php } ?>
+        </select>
+    </li>
+
+    <li class="multiplechoice1" data-model-type="mc1" data-entity="question">
+        <div class="delete">X</div>
+
+        <div class="question" data-type="textarea" data-field="question">Frage-Text</div>
+
+        <div class="question2" data-type="textarea" data-field="question2">Rückfrage-Text</div>
+
+        <br>
+        <textarea name="q1[advice]"></textarea>
+        <span class="id" style="display:none;" data-field="id"></span>
+        <span><?php echo $this->__str('Kategorie:') ?></span>
+        <select name="category_id" >
+            <option>allgemein</option>
+            <?php
+            foreach($this->categories as $c) { ?>
+                <option value="<?php $c->id ?>"><?php echo $c->title ?></option>
+            <?php } ?>
+        </select>
+    </li>
+
+</ul>

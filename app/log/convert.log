@@ -1,0 +1,2 @@
+Starting Convert /Users/flobo/Webserver/pageflipper/books/TEST_190
+gs -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 -sDEVICE=jpeg -dJPEGQ=100 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r204x204 -sOutputFile=/Users/flobo/Webserver/pageflipper/books/TEST_190/jpglarge/page_%d.jpg /Users/flobo/Webserver/pageflipper/books/TEST_190/DVHT333B1TT445649.PDF

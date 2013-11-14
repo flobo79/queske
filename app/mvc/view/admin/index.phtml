@@ -1,0 +1,184 @@
+
+<div class="row">
+    <div class="span2 tabbable tabs-left">
+        <ul id="list" class="nav nav-tabs">
+            <?php
+            foreach($this->list as $entry) { ?>
+                <li <?php if($this->user != "neu" && $entry->id == $this->user['id']) echo ' class="active"' ?>><a href="<?php echo BASEURL ?>/admin/index/<?php echo $entry->id ?>"><?php echo $entry->name ?></a></li>
+            <?php } ?>
+            <li><a href="<?php echo BASEURL ?>/admin/index/neu">Neuen Mandanten</a></li>
+        </ul>
+    </div>
+
+
+    <?php if($this->user) {
+         $user = $this->user == "neu" ? false : true;
+    ?>
+
+    <div id="details" class="span10">
+        <?php if($user) { if(!empty($this->user['updated'])) { ?>
+            <div class="alert alert-success"><?php echo $this->__str('Änderungen gespeichert!') ?></div>
+        <?php  }} ?>
+
+
+        <form method="post" action="" id="form" enctype="multipart/form-data">
+            <fieldset>
+                <legend><?php echo $user ? $this->user['name'] :  "Neuen Mandanten anlegen";  ?></legend>
+
+
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active"><a href="#account"  data-toggle="tab"><?php echo $this->__str('Benutzerkonto') ?></a></li>
+                    <li><a href="#ftp" data-toggle="tab"><?php echo $this->__str('FTP-Einstellungen') ?></a></li>
+                    <li><a href="#tracking" data-toggle="tab"><?php echo $this->__str('Tracking') ?></a></li>
+                    <li><a href="#style" data-toggle="tab"><?php echo $this->__str('Book-Einstellungen') ?></a></li>
+                </ul>
+
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="account">
+                        <label for="usertype"><?php echo $this->__str('Benutzertyp'); ?>:</label>
+                        <input type="hidden" name="usertype" value="<?php echo !empty($this->user['usertype']) ? $this->user['usertype'] : "" ?>" id="btn-input-usertype" />
+                        <div class="btn-group usertype" data-toggle="buttons-radio">
+                            <button id="btn-one" type="button" data-toggle="button" name="option" value="mandant" class="btn"><?php echo $this->__str('Mandant'); ?></button>
+                            <button id="btn-two" type="button" data-toggle="button" name="option" value="admin" class="btn"><?php echo $this->__str('Admin'); ?></button>
+                        </div>
+
+                        <br><br>
+
+                        <label for="name"><?php echo $this->__str('Name'); ?>:</label>
+                        <input id="name" type="text" name="name" class="input-xlarge" placeholder="" value="<?php if($user) echo $this->user['name'] ?>">
+                        <label for="login"><?php echo $this->__str('Login'); ?>:</label>
+                        <input id="login" type="text" name="login" class="input-xlarge" placeholder="" value="<?php if($user) echo $this->user['login'] ?>">
+                        <label for="password"><?php echo $this->__str('Passwort'); ?>:</label>
+                        <input id="password" type="password" name="password" class="input-xlarge" placeholder="" value="">
+
+                    </div>
+
+
+
+                    <div class="tab-pane" id="ftp">
+
+                        <label for="ftp_address"><?php echo $this->__str('FTP-Server'); ?>:</label>
+                        <input id="ftp_address" type="text" name="ftp_address" class="input-xlarge" placeholder="myserver.com" value="<?php if($user) echo $this->user['ftp_address'] ?>">
+
+                        <label for="ftp_user"><?php echo $this->__str('FTP-Benutzer'); ?>:</label>
+                        <input id="ftp_user" type="text" name="ftp_user" class="input-xlarge" value="<?php if($user) echo $this->user['ftp_user'] ?>">
+
+
+                        <label for="ftp_password"><?php echo $this->__str('FTP-Passwort'); ?>:</label>
+                        <input id="ftp_password" type="password" name="ftp_pass" class="input-xlarge" />
+
+                        <label for="ftp_dir"><?php echo $this->__str('FTP-Ziel-Verzeichnis'); ?>:</label>
+                        <input id="ftp_dir" type="text" name="ftp_dir" class="input-xlarge" placeholder="/ftpfolder/books" value="<?php if($user) echo $this->user['ftp_dir'] ?>" />
+                    </div>
+
+
+                    <div class="tab-pane" id="tracking">
+
+                        <label for="ga_code">Google Analytics</label>
+                        <input id="ga_code" type="text" name="ga_code" value="<?php if($user) echo $this->user['ga_code'] ?>" />
+                        <span class="help-block"><?php echo $this->__str('zB UA-37177789-1'); ?></span>
+                        <br>
+                        <label for="js_code"><?php echo $this->__str('optionaler HTML-Code'); ?></label>
+                        <textarea id="js_code" type="text" name="js_code" ><?php if($user && !empty($this->user['js_code'])) echo $this->user['js_code'] ?></textarea>
+
+                    </div>
+
+
+                    <div class="tab-pane" id="style">
+                        <label for="titlebase"><?php echo $this->__str('Basis-Titel'); ?>:</label>
+                        <input id="titlebase" type="text" name="titlebase" value="<?php if($user) echo $this->user['titlebase'] ?>" />
+                        <span class="help-block"><?php echo $this->__str('str_basetitle'); ?></span>
+                        <br>
+                        <label for="bgimage"><?php echo $this->__str('Hintergrundbild'); ?>:</label>
+                        <input id="bgimage" type="file" name="bgimage" multiple="multiple" />
+                        <span class="help-block"><?php echo $this->__str('str_backgroundimage'); ?></span>
+
+
+                        <?php if(!empty($this->user['user_id']) && file_exists($bgimg_src = WEBROOT."/data/".$this->user['user_id']."/bgimage.jpg")){ ?>
+                        <div  id="img_hg">
+                          <img src="<?php echo $img = BASEURL."/data/".$this->user['user_id']."/bgimage.jpg" ?>" width="100" onclick="window.open(<?php echo $img ?>")">
+                          <br>
+                            <div class="btn btn-mini" id="bu_delete_hg"><i class="icon-trash"></i> <?php echo $this->__str('Bild löschen'); ?></div>
+                        </div>
+                        <?php } ?>
+
+                        <br>
+                        <label for="bgtype"><?php echo $this->__str('Hintergrund darstellen'); ?>:</label>
+                        <input type="hidden" name="bgtype" value="<?php echo !empty($this->user['bgtype']) ? $this->user['bgtype'] : "1"; ?>" id="btn-input-bgtype" />
+                        <div class="btn-group bg" data-toggle="buttons-radio">
+                            <button id="btn-bgtype-1" type="button" data-toggle="button" name="option" value="1" class="btn"><?php echo $this->__str('nicht gekachelt'); ?></button>
+                            <button id="btn-bgtype-2" type="button" data-toggle="button" name="option" value="2" class="btn"><?php echo $this->__str('gekachelt'); ?></button>
+                            <button id="btn-bgtype-3" type="button" data-toggle="button" name="option" value="3" class="btn"><?php echo $this->__str('gestreckt'); ?></button>
+                        </div>
+                        <br><br>
+                        <label for="bgcolor_input"><?php echo $this->__str('Hintergrundfarbe'); ?>:</label>
+                        <div class="input-append color bscp" data-color="<?php if($user) echo $this->user['css_bgcolor'] ?>" data-color-format="hex" id="bgcolor" data-colorpicker-guid="7" style="background-image: initial;">
+                            <input name="css_bgcolor" type="text" class="span1" value="<?php if($user) echo $this->user['css_bgcolor'] ?>" id="bgcolor_input">
+                            <span class="add-on"><i style="background-color: <?php if($user) echo $this->user['css_bgcolor'] ?>"></i></span>
+
+                        </div>
+                        <span class="help-block"><?php echo $this->__str('str_backgroundcolor'); ?></span>
+                    </div>
+                </div>
+
+
+                <br>
+                <button type="submit" class="btn"><i class="icon-save"></i> <?php echo $this->__str('Speichern'); ?></button>
+            </fieldset>
+        </form>
+
+        <div class="clear"></div>
+
+    </div>
+    <?php } ?>
+</div>
+
+<script
+<script>
+    function init() {
+        $('#myTab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+            window.location.hash = e.delegateTarget.hash;
+        })
+
+        if(document.location.hash != "") {
+            $('a[href='+document.location.hash+']').tab('show');
+        }
+
+        $('#bgcolor').colorpicker();
+
+        $('.btn-group.bg button').click(function() {
+            $('#btn-input-bgtype').val($(this).val());
+        });
+
+        $('#btn-bgtype-<?php echo !empty($this->user['bgtype']) ? $this->user['bgtype'] : "1" ?>').addClass('active');
+
+        $('.btn-group.usertype button').click(function() {
+            $('#btn-input-usertype').val($(this).val());
+        });
+
+        <?php if(!empty( $this->user['usertype'])) { ?>
+        $('#btn-<?php echo $this->user['usertype'] == 'mandant' ? 'one' : 'two'; ?>').addClass('active');
+
+
+        $('#bu_delete_hg').click(function(r) {
+            $.ajax({
+                url: '<?php echo BASEURL ?>/admin/deletehg/<?php echo $this->user['id'] ?>',
+                success: function(r) {
+                    if(r == "ok") {
+                        $('#img_hg').remove();
+                    } else {
+                        alert(r);
+                    }
+                }
+            });
+        });
+
+        <?php } ?>
+
+    }
+
+
+</script>

@@ -1,0 +1,25 @@
+<?php
+
+// database connection
+define('DB_TYPE', 'mysql');
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'queske');
+define('DB_USER', '');
+define('DB_PASS', '');
+
+define('DESIGN', 'default');
+define('DEFAULT_LOCALE', 'de_DE');
+define('HOST', "http://queske.local");
+define('BASEURL', '');  // add base directory for app (ie /v2 if app is running in url.de/v2/index.php)
+define('DEFAULT_ROUTE', "");
+
+define('BASEDIR', dirname(__FILE__));
+define('WEBROOT', dirname(BASEDIR));
+define('CONTROLLER', BASEDIR.'/mvc/controller');
+define('MODEL', BASEDIR.'/mvc/model');
+define('VIEW', BASEDIR.'/mvc/view');
+define('LIBRARY', BASEDIR.'/library');
+define('TEMPLATES', BASEDIR.'/templates');
+define('LOCALE', BASEDIR.'/locale');
+define('LOGDIR', BASEDIR.'/log');
+define('TMPDIR', WEBROOT.'/tmp');

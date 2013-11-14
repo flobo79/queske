@@ -1,0 +1,9 @@
+/Users/flobo/Webserver/pageflipper/app/library/convert.sh: line 44: gs: command not found
+cp: /Users/flobo/Webserver/pageflipper/books/TEST_190/jpglarge/*: No such file or directory
+/Users/flobo/Webserver/pageflipper/app/library/convert.sh: line 58: mogrify: command not found
+cp: /Users/flobo/Webserver/pageflipper/books/TEST_190/jpglarge/*: No such file or directory
+/Users/flobo/Webserver/pageflipper/app/library/convert.sh: line 72: mogrify: command not found
+cp: /Users/flobo/Webserver/pageflipper/books/TEST_190/jpgmobile/*: No such file or directory
+/Users/flobo/Webserver/pageflipper/app/library/convert.sh: line 84: mogrify: command not found
+cp: /Users/flobo/Webserver/pageflipper/books/TEST_190/jpg/*: No such file or directory
+/Users/flobo/Webserver/pageflipper/app/library/convert.sh: line 96: mogrify: command not found

@@ -1,0 +1,260 @@
+
+
+    <div class="row">
+
+        <div class="help">
+        Hier kannst du Fragenkataloge erstellen oder bearbeiten.
+        </div>
+
+        <div class="navbar span12">
+            <div class="navbar-inner">
+
+
+                <div class="brand span1" style="padding:10px 0; width:80px;"></div>
+                <div class="brand span4" style="padding:10px 0; width:330px;"><?php echo $this->__str('Bezeichnung'); ?></div>
+                <div class="brand span2" style="padding:10px 0; width:150px;"><?php echo $this->__str('Erstellt'); ?></div>
+
+                <div class="brand" style="padding:10px 0;"><?php echo $this->__str(' '); ?></div>
+
+                <ul class="nav pull-right">
+                    <li class="divider-vertical"></li>
+                    <li>
+                        <ul class="nav right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <?php echo $this->__str('Aktionen'); ?>
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#modalReprocess" id="bu_reprocess" data-toggle="modal"><i class="icon-cogs"></i> <?php echo $this->__str('Aktualisieren') ?></a></li>
+                                    <li><a href="#modalDelete" id="bu_delete" data-toggle="modal"><i class="icon-trash"></i> <?php echo $this->__str('Löschen') ?></a></li>
+
+                                    <?php if($this->client['ftp_address']) { ?>
+                                        <li><a href="#modalUpload" id="upload_link" role="button"  data-backdrop="static" data-keyboard="false" data-toggle="modal"><i class="icon-upload"></i> <?php echo $this->__str('FTP-Upload') ?></a></li>
+                                    <?php } ?>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <?php if($this->survey) { ?>
+                    <li class="divider-vertical"></li>
+                    <li>
+                        <ul class="nav right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <?php echo $this->__str('Ansicht') ?>
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#btn_open_newwindow"  id="btn_open_newwindow"><i class="icon-external-link "></i> <?php echo $this->__str('Vollbild') ?></a></li>
+                                    <li><a href="#btn_open_mobile" id="btn_open_mobile" ><i class="icon-external-link "></i> <?php echo $this->__str('Mobile-Version') ?></a></li>
+
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <?php } ?>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+        
+    <div class="row">
+        <table class="table span12" style="margin-top: -49px;" id="surveys">
+            <thead style="visibility: hidden; ">
+                <tr>
+                    <th class="span1"></th>
+                    <th class="span4"><?php echo $this->__str('Bezeichnung'); ?></th>
+                    <th class="span2"><?php echo $this->__str('Erstellt'); ?></th>
+                    <th class=""><?php echo $this->__str('Status'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php if($this->list) {
+              foreach($this->list as $e) { ?>
+                <tr id="row_<?php echo $e->id ?>">
+                    <td><input  data-name="id" type="checkbox" name="books[]" value="<?php echo $e->id ?>" /></td>
+                    <td><a  data-name="title" href="<?php echo BASEURL ?>/questionnaires/editor/<?php echo $e->id; ?>"><?php echo $e->title ?></a></td>
+                    <td data-name="created"><?php echo date("d.m.Y, h:i", $e->created); ?></td>
+                    <td> </td>
+                </tr>
+            <?php }} else {
+              echo $this->__str('keine questionnaires vorhanden');
+            } ?>
+               <tr style="display:none" class="template" id="row_X">
+                    <td><input type="checkbox" data-name="id" name="surveys[]" value="" /></td>
+                    <td><a data-name="title" href="<?php echo BASEURL ?>/questionnaires/editor/" class="url">_title_</a></td>
+                    <td data-name="created"></td>
+                    <td> </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p class="span12"><a href="#modalCreate" role="button" class="btn" data-toggle="modal"><?php echo $this->__str('+ neuen Fragebogen erstellen') ?></a></p>
+    </div>
+
+
+       
+
+        <!-- Modal REPROCESS -->
+        <div id="modalCreate" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel"><?php echo $this->__str('Neue Survey erstellen') ?></h3>
+            </div>
+            <div class="modal-body">
+                <div class="control-group" id="new_title">
+                  <label class="control-label" for="inputWarning"><?php echo $this->__str('Bezeichnung') ?></label>
+                  <div class="controls">
+                    <input type="text" id="create_title" name="create_title">
+                    <span class="help-inline"></span>
+                  </div>
+                </div>
+                <p><?php echo $this->__str('vorhandene Survey kopieren?') ?></p>
+                <select name="create_copy" id="create_copy">
+                  <option value=""><?php echo $this->__str('nein') ?></option>
+                  <?php foreach($this->list as $s) { 
+                    
+                   
+                  ?>
+                  <option value="<?php echo $s->id ?>"><?php echo $s->title ?></option>
+                  
+                  
+                  <?php } ?>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_create"> <?php echo $this->__str('ok') ?> </button>
+            </div>
+        </div>
+
+
+        <!-- Modal DELETE -->
+        <div id="modalDelete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel"><?php echo $this->__str('str_delete_title') ?></h3>
+            </div>
+            <div class="modal-body">
+                <p><?php echo $this->__str('str_delete_body') ?></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_delete"><?php echo $this->__str('löschen') ?></button>
+            </div>
+        </div>
+
+
+        <!-- Modal UPLOAD-->
+        <div id="modalUpload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <h3 id="myModalLabel"><?php echo $this->__str('FTP-Upload') ?></h3>
+            </div>
+            <div class="modal-body start">
+                <p><?php echo $this->__str('str_upload_body') ?></p>
+                <p><input type="checkbox" name="force_upload" id="force_upload" value="1" /> <?php echo $this->__str('str_force_upload') ?></p>
+            </div>
+
+
+            <div class="modal-body upload-uploading">
+                <p><?php echo $this->__str('Bitte warten') ?></p>
+                <div class="progress progress-striped active">
+                    <div class="bar" style="width: 0%;">0%</div>
+                </div>
+                <h4 id="ftp_activity_title" style="cursor: pointer;"><div class="icon icon-plus-sign"></div> <?php echo $this->__str('Aktivität') ?>:</h4>
+                <div id="ftp_activity" style="height:0px; overflow: auto;"></div>
+            </div>
+
+            <div class="modal-body upload-finished">
+                <h2><?php echo $this->__str('Fertig!') ?></h2>
+                <p><?php echo $this->__str('Der Upload ist abgeschlossen!') ?></p>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" id="action_upload_cancel" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_upload"><?php echo $this->__str('Upload') ?></button>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+
+          
+            function init() {
+                modalUpload = $('#modalUpload');
+
+                ftp_activitiy = $('#ftp_activity');
+
+                modalUpload.find('.modal-body.start').show();
+                modalUpload.find('.modal-body.upload-uploading').hide();
+                modalUpload.find('.modal-body.upload-finished').hide();
+
+                $('#upload_link').click(function() {
+                    modalUpload.find('.modal-body.start').show();
+                    modalUpload.find('.modal-body.upload-uploading').hide();
+                    modalUpload.find('.modal-body.upload-finished').hide();
+                });
+
+                  
+
+                $("#action_create").click(function() {
+                    $.post("<?php echo BASEURL ?>/surveys/create/", {data:{
+                      title:$('#create_title').val(),
+                      copy:$('#create_copy').val()
+                    }}
+                    ).done(function (data) {
+                        var data = JSON.parse(data);
+
+                        if(data.data.id) {
+                          
+                          var tmp = $('#surveys tr.template').clone();
+                          
+                          var fields = tmp.find('[data-name]');
+                          fields.each(function() {
+                            var field = $(this).attr('data-name');
+                            
+                            switch(this.tagName) {
+                            case "INPUT":
+                              this.value = data.data[field];
+                              break;
+                                                     
+                            default:
+                              this.innerHTML = data.data[field];
+                              break;
+                            }
+                          });
+                          
+                          tmp.find('.url').attr('href', "/surveys/survey/"+data.data.id);
+                          tmp.show();
+                          
+                          $('#surveys tbody').append(tmp);
+                          
+                          $('#modalCreate').modal('hide');
+                        };
+                    });
+                });
+                
+                
+                function getIds() {
+                    return $.makeArray($('input[name="books[]"]:checked').map(function() {return $(this).val();})).join(',');
+                }
+
+            
+                
+                $("#action_delete").click(function() {
+                    document.location.href="<?php echo BASEURL ?>/surveys/delete/"+getIds();
+                });
+            }
+
+
+
+        </script>
+
+
+
+
+</div>
+

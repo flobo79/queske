@@ -1,0 +1,507 @@
+<style>
+
+  #questions ul, #questions li,
+  #templates ul,  #templates li {
+    margin:0;
+    padding:0;
+    list-style: none;
+  }
+  
+  #questions>li, #templates>li {
+    margin-bottom: 10px;
+    box-shadow: 0px 3px 5px #666;
+    border-radius: 20px;
+    padding:20px;
+    background-color:#FFF;
+  }
+
+  body [data-type="input"], body [data-type="textarea"] {
+    border: 1px solid transparent;
+  }
+
+  body [data-type="input"]:hover, body [data-type="textarea"]:hover {
+      border:1px dashed #CCC;
+  }
+  
+  ul, ol {
+    margin:0px;
+    padding:0px;
+  }
+  
+  input, textarea {
+    width:95%;
+  }
+  
+  .delete {
+    display:none;
+    position: absolute;
+    margin-left: 420px;
+    margin-top: -5px;
+    cursor: pointer;
+  }
+  
+  #questions>li:hover .delete {
+    display:block;
+
+  }
+  
+  #questions>li {
+
+  }
+  
+  #questions>li:hover {
+       
+  }
+
+  #templates>li {
+      cursor: move;
+  }
+  #templates>li * {
+    pointer-events: none;
+  }
+  
+  li.selected a {
+    background-color: #CCC !important;
+  }
+  
+  .h1 { 
+    font-size: 26px;
+    font-weight: bold;
+    margin:5px 0;
+    width:100%;
+  }
+  
+  .left {
+    border-right: 1px dashed #CCC;
+    padding-right: 70px;
+  }
+  
+</style>
+
+<div class="row">
+    
+    <h1 data-type="input" id="str_title" class="h1"><?php echo trim($this->survey->title); ?></h1>
+    
+    <div class="span5 left">
+        
+        <h4>Einleitungstext:</h4>
+        
+        
+        <div class="intro" style="width:100%;height:100px;" data-type="textarea" id="str_intro"><?php echo trim($this->survey->intro); ?></div>
+        
+        <br>
+        
+        <h4>Fragen-Katalog:</h4>
+        <ul id="questions" class="questions edit">
+          <!-- HERE GOES THE RENDERED SURVEY -->
+        </ul>
+
+      </div> 
+        
+        
+        
+        
+        <div class="span4 offset2">
+          <h3>Templates</h3>
+          <?php include(dirname(__FILE__)."/_templates.phtml") ?>
+        </div>
+
+        
+        
+        <!-- Modal REPROCESS -->
+        <div id="modalReprocess" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel"><?php echo $this->__str('str_reprocess_title') ?></h3>
+            </div>
+            <div class="modal-body">
+                <p><?php echo $this->__str('str_reprocess_description') ?></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_reprocess"> <?php echo $this->__str('ok') ?> </button>
+            </div>
+        </div>
+
+
+        <!-- Modal DELETE -->
+        <div id="modalDelete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="myModalLabel"><?php echo $this->__str('str_delete_title') ?></h3>
+            </div>
+            <div class="modal-body">
+                <p><?php echo $this->__str('str_delete_body') ?></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_delete"><?php echo $this->__str('löschen') ?></button>
+            </div>
+        </div>
+
+
+        <!-- Modal UPLOAD-->
+        <div id="modalUpload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+                <h3 id="myModalLabel"><?php echo $this->__str('FTP-Upload') ?></h3>
+            </div>
+            <div class="modal-body start">
+                <p><?php echo $this->__str('str_upload_body') ?></p>
+                <p><input type="checkbox" name="force_upload" id="force_upload" value="1" /> <?php echo $this->__str('str_force_upload') ?></p>
+            </div>
+
+
+            <div class="modal-body upload-uploading">
+                <p><?php echo $this->__str('Bitte warten') ?></p>
+                <div class="progress progress-striped active">
+                    <div class="bar" style="width: 0%;">0%</div>
+                </div>
+                
+                <h4 id="ftp_activity_title" style="cursor: pointer;"><div class="icon icon-plus-sign"></div> <?php echo $this->__str('Aktivität') ?>:</h4>
+                <div id="ftp_activity" style="height:0px; overflow: auto;"></div>
+            </div>
+
+            <div class="modal-body upload-finished">
+                <h2><?php echo $this->__str('Fertig!') ?></h2>
+                <p><?php echo $this->__str('Der Upload ist abgeschlossen!') ?></p>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" id="action_upload_cancel" aria-hidden="true"><?php echo $this->__str('abbrechen') ?></button>
+                <button class="btn btn-primary" id="action_upload"><?php echo $this->__str('Upload') ?></button>
+            </div>
+        </div>        
+        </div>
+
+
+        <script type="text/javascript">
+            
+            var questions = {};
+            var templates = {};
+            
+            function init() {
+                questions = JSON.parse('<?php 
+                
+                $list = array();
+                foreach($this->survey->getQuestions() as $q) {
+                  $list[] = $q->getData();
+                }
+                echo str_replace(array('\r','\n'), '##', json_encode($list)) ?>');
+                
+                
+                // fetch all question types
+                $('#templates>li[data-model-type]').each(function() {
+                  templates[$(this).attr('data-model-type')] = this;
+                });
+                
+                
+                // for all questions create html and add data
+                $(questions).each(function() {
+                  var q = $(templates[this.type]).clone();
+                  
+                  for(e in this) {
+                    if(this[e] != null) {
+                      q.find('.'+e).html(this[e].replace(/#/g, '<br>'));
+                    }
+                    
+                  };
+                  
+                  $('#questions').append(q[0]);
+                });
+                 
+
+
+
+
+                // active dragging
+                $('#templates').find('li').draggable({
+                    connectToSortable: '#questions',
+                    helper: 'clone',
+                    revert: 'invalid'
+                });
+                
+
+                
+                $( "#questions" ).sortable({
+                    //connectWith: "#questions",
+                    //placeholder: "ui-state-highlight",
+                    revert: true,
+                    receive: function( event, ui ) {
+                        var data = {
+                          'order':0, 
+                          'survey_id':<?php echo $this->survey->getId() ?>,
+                          'type': ui.item.attr('data-model-type')
+                        };
+                        
+                        $(ui.item).find('[data-field]').each(function() {
+                          data[$(this).attr('data-field')] = $(this).html();
+                        });
+                        
+                        $.ajax({
+                          dataType: "json",
+                          method: "POST",
+                          url: '/surveys/addquestion',
+                          data: data,
+                          success: function(res) {
+                            data.id = res.id;
+                            questions.push(data);
+                            
+                            ui.item.find('.id').html(data.id);
+
+                            resortQuestions();
+                          }
+                        });
+                    },
+
+                    update: function(event, ui) {
+                        resortQuestions();
+                    }
+                }).disableSelection();
+                
+                
+                
+                function resortQuestions() {
+                    var i = 1;
+                    console.log('update sorting');
+                    $('#questions>li').each(function() {
+                      updateQuestion($(this).find('.id').html(), 'order', i);
+                      i++;
+                    });
+                    
+                    save();
+                }
+                
+                $('.rating .pagination li').bind('click', function (e) {
+                  $(this).parent().find('li').removeClass('selected');
+                  $(this).addClass('selected');
+                });
+                
+
+                // delete questions
+                $('#questions .delete').bind('click', function () { 
+                  var li = $(this).closest('li');
+                  var id = li.find('.id').html();
+                  li.fadeOut(200, function() { this.remove(); })
+                  $.post('/surveys/delquestion', {id:id});                
+                });
+                
+
+                
+                
+                $('body').dblclick(function(e) {
+                  // activate editing on fields that have a data-type attribute
+                  if(typeof $(e.target).attr('data-type') != "undefined") {
+                     $(e.target).changeType($(e.target).attr('data-type'))
+                        
+                        // on blur change it right back and update
+                        .blur(function () {
+                          var el = $(this).changeType($(this).attr('data-type'));
+                          updateField(el);
+                     }).focus();
+                  }
+                });
+                
+
+
+
+
+
+
+
+
+                
+                /**
+                * changes an element type to something else 
+                */
+                $.fn.changeType = function(type) {
+                  console.log($('<'+type+'></'+type+'>'));
+                  var newelement = $('<'+type+'></'+type+'>');
+                      newelement.attrs($(this).attrs());
+                      newelement.attr('data-type', this[0].tagName.toLowerCase());
+                 
+                  if($(this).attr('data-type').toLowerCase() == "input" || $(this).attr('data-type').toLowerCase() == "textarea") {
+                    newelement.val(this[0].innerHTML.replace(/<br>/g, '\n'));
+                  } else {
+                    newelement.html($(this).val().replace(/\n/g, '<br>'));
+                  }
+                  
+                  $(this).replaceWith(newelement);
+                  
+                  return newelement;
+                }
+
+
+                /**
+                 *  Get or Set all attributes of an html element
+                 */
+                $.fn.attrs = function(map) {
+                    
+                    if(map) {
+                      for(e in map) {
+                        this.attr(e, map[e]);
+                      }
+                    } else {
+                      
+                      var element = this[0];
+                      var a = this[0].attributes, // attributes object shorcut
+                          l = a.length, // object length
+                          map = {}, // map object
+                          i = 0, // for the loop
+                          v; // hold current node value in the loop
+               
+                      // loop through attributes and build our map
+                      for (;i < l; i++) {
+                          v = a[i].nodeValue;
+                          if (v) map[a[i].nodeName] = v;
+                      };
+               
+                      // for contentEditable we check that it is really set due to IE
+                      if (map.contentEditable) {
+                          var div = document.createElement('<div />').appendChild(e);
+                          if (!(div.innerHTML.toLowerCase().indexOf('contenteditable') !== -1)) {
+                              delete map.contentEditable;
+                          };
+                      };
+               
+                      // return the map object
+                      return map;
+                    }
+                };
+                             
+                
+                
+                
+                
+                
+                function updateField(el) {
+                   var box = el.closest('[data-entity]');
+                   var entity = box.attr('data-entity');
+                   var id = box.find('.id').html();
+                   
+                   if(el.html() == "") {
+                     el.html('...');
+                   }
+                   
+                   updateQuestion(id, el.attr('class'), el.html());
+                   
+                }
+                
+                function updateQuestion(id, field, value) {
+                  $q(id)[field] = value;
+                  //save();
+                }
+                
+                
+                function save () {
+                  $.post('/surveys/update', {
+                    questions: questions, 
+                    title: $('#str_title').html(), 
+                    intro: $('#str_intro').html(), 
+                    outro: $('#str_outro').html(), 
+
+                    id:<?php echo $this->survey->getId() ?>
+                  });
+                }
+                
+                
+                function $q(id) {
+                  var q = false;
+                   $(questions).each(function() {
+                     for(e in this) {
+                       if(e == 'id' && this[e] == id) {
+                         q = this;
+                         return this;
+                       }
+                     };
+                   });
+                   
+                   return q;
+                }
+                
+                modalUpload = $('#modalUpload');
+                ftp_activitiy = $('#ftp_activity');
+
+                modalUpload.find('.modal-body.start').show();
+                modalUpload.find('.modal-body.upload-uploading').hide();
+                modalUpload.find('.modal-body.upload-finished').hide();
+
+                $('#upload_link').click(function() {
+                    modalUpload.find('.modal-body.start').show();
+                    modalUpload.find('.modal-body.upload-uploading').hide();
+                    modalUpload.find('.modal-body.upload-finished').hide();
+                });
+
+
+
+
+
+                $("#action_delete").click(function() {
+                    document.location.href="<?php echo BASEURL ?>/publications/delete/"+getIds();
+                });
+
+
+               function getIds() {
+                  return $.makeArray($('input[name="books[]"]:checked').map(function() {return $(this).val();})).join(',');
+              }
+  
+            
+
+             <?php if($this->survey) { ?>
+
+                $('#action_upload').click(function() {
+                    $('#action_upload').hide();
+                    $('#action_upload_cancel').hide();
+                    modalUpload.find('.modal-body.start').hide();
+                    modalUpload.find('.modal-body.upload-uploading').show();
+
+                    pollFTPstatus();
+
+                    $.ajax({
+                        url: "<?php echo BASEURL ?>/publications/upload/<?php echo $this->survey->getId() ?>/"+$('#force_upload').is(':checked')
+
+                    }).done(function () {
+
+                        modalUpload.find('.modal-body.upload-uploading').hide();
+                        modalUpload.find('.modal-body.upload-finished').show();
+                        clearInterval(int_poll);
+                        $('#action_upload_cancel').html('schliessen').show();
+                        document.title = "Upload fertig";
+                    });
+                });
+
+
+                function pollFTPstatus() {
+                    int_poll = setInterval(function() {
+                        $.getJSON("<?php echo BASEURL ?>/publications/uploadstatus/<?php echo $this->survey->getId() ?>", function(data) {
+                            modalUpload.find('.bar').css('width',String(data.progress)+'%').html(String(data.progress)+'%');
+                            document.title = data.progress+"% <?php echo $this->__str('hochgeladen') ?>";
+                            ftp_activitiy.html(data.log.split("\n").join("<br>"));
+                            ftp_activitiy.scrollTop(ftp_activitiy[0].scrollHeight - ftp_activitiy.height());
+                        });
+                    },2000);
+                }
+                <?php } ?>
+
+                $('#btn_open_newwindow').click(function() { window.open($('#preview').attr('src')); });
+                $('#btn_open_mobile').click(function() { window.open($('#preview').attr('src')+'mobile/'); });
+                $('#btn_open_megazine').click(function() { window.open($('#preview').attr('src')+'index_megazine.html'); });
+
+                $('#ftp_activity_title').click(function() {
+                    var icon = $(this).find('.icon');
+                    if(icon.hasClass('icon-plus-sign')) {
+
+                        $('#ftp_activity').show().animate({'height':200});
+                        icon.removeClass('icon-plus-sign').addClass('icon-minus-sign');
+                    } else {
+                        $('#ftp_activity').animate({'height':0}, 300, 'swing', function () { $(this).hide(); });
+                        icon.removeClass('icon-minus-sign').addClass('icon-plus-sign');
+                    }
+                });
+
+
+            }
+
+
+
+        </script>
+
