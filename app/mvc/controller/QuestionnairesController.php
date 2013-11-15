@@ -115,7 +115,7 @@ class QuestionnairesController extends BaseController {
 
 
     /**
-     * deletes a survey
+     * deletes a questionnaire
      *
      */
     function deleteAction() {
@@ -127,7 +127,7 @@ class QuestionnairesController extends BaseController {
         }
         
         foreach(explode(",", $this->request[0]) as $id) {
-            if($ent = new Survey($id)) {
+            if($ent = new Questionnaire($id)) {
                $ent->trash();
             }
         }
@@ -143,8 +143,8 @@ class QuestionnairesController extends BaseController {
         $question->update($q);
       }
       
-      $survey = new Survey($_POST['id']);
-      $survey->update($_POST);
+      $qns = new Questionnaire($_POST['id']);
+      $qns->update($_POST);
     }
     
     

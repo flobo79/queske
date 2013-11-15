@@ -240,7 +240,7 @@
                         $.ajax({
                           dataType: "json",
                           method: "POST",
-                          url: '/surveys/addquestion',
+                          url: '/questionnaires/addquestion',
                           data: data,
                           success: function(res) {
                             data.id = res.id;
@@ -282,7 +282,7 @@
                   var li = $(this).closest('li');
                   var id = li.find('.id').html();
                   li.fadeOut(200, function() { this.remove(); })
-                  $.post('/surveys/delquestion', {id:id});                
+                  $.post('/questionnaires/delquestion', {id:id});
                 });
                 
 
@@ -368,10 +368,7 @@
                     }
                 };
                              
-                
-                
-                
-                
+
                 
                 function updateField(el) {
                    var box = el.closest('[data-entity]');
@@ -383,17 +380,16 @@
                    }
                    
                    updateQuestion(id, el.attr('class'), el.html());
-                   
                 }
                 
                 function updateQuestion(id, field, value) {
                   $q(id)[field] = value;
-                  //save();
+                  save();
                 }
                 
                 
                 function save () {
-                  $.post('/surveys/update', {
+                  $.post('/questionnaires/update', {
                     questions: questions, 
                     title: $('#str_title').html(), 
                     intro: $('#str_intro').html(), 
