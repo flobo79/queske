@@ -1,0 +1,61 @@
+#php_value output_handler ob_gzhandler
+php_flag display_errors on
+php_value error_reporting -1
+php_flag log_errors on
+
+# handle file types better
+AddType application/x-shockwave-flash .swf
+AddType video/x-flv .flv
+AddType image/x-icon .ico
+
+# send the language tag and default character set
+# AddType 'text/html; charset=UTF-8' html
+AddDefaultCharset UTF-8
+DefaultLanguage de-DE
+
+# cache images and flash content for one month
+<FilesMatch ".(flv|gif|jpg|jpeg|png|ico|swf)$">
+	#Header set Cache-Control "max-age=2592000"
+</FilesMatch>
+
+# cache text, css, and javascript files for one week
+<FilesMatch ".(js|css|pdf|txt)$">
+	#Header set Cache-Control "max-age=604800"
+</FilesMatch>
+
+# cache html and htm files for one day
+<FilesMatch ".(html|htm)$">
+	#Header set Cache-Control "max-age=4320000"
+</FilesMatch>
+
+# implement minimal caching during site development
+<FilesMatch "\.(flv|gif|jpg|jpeg|png|ico|js|css|pdf|swf|html|htm|txt)$">
+	#Header set Cache-Control "max-age=0"
+</FilesMatch>
+
+# explicitly disable caching for scripts and other dynamic files
+<FilesMatch "\.(pl|php|cgi|spl|scgi|fcgi)$">
+	#Header unset Cache-Control
+</FilesMatch>
+
+php_value file_upload on
+php_value memory_limit 256M
+php_value max_execution_time 18000
+php_value max_input_time 18000
+php_value post_max_size 200M
+php_value upload_max_filesize 100M
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !library(.+)$
+RewriteCond %{REQUEST_FILENAME} !css(.+)\.css$
+RewriteCond %{REQUEST_FILENAME} !design(.+)$
+RewriteCond %{REQUEST_FILENAME} !css(.+)\.css$
+RewriteCond %{REQUEST_FILENAME} !books(.+)$
+RewriteCond %{SCRIPT_FILENAME} !.*/index.php$
+RewriteRule (.*)$ index.php?query=$1&%{QUERY_STRING}
+
+
+
+Header set Access-Control-Allow-Origin "*"
