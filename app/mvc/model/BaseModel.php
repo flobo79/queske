@@ -15,7 +15,7 @@ class BaseModel {
 	}
 	
 	function getDB() {
-		return Dba::getAdapter();
+		return \Library\Dba\Dba::getAdapter();
 	}
 
     public function getIdentity() {

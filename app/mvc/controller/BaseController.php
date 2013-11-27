@@ -20,12 +20,13 @@ class BaseController
     function BaseController()
     {
 
-        $this->identity = new User();
+
 
         if (empty($_SESSION['identity'])) {
-            $_SESSION['identity'] = new User();
+            $_SESSION['identity'] = array(); //new Users();
         }
 
+        $this->identity = $_SESSION['identity'];
 
         if (!empty($_REQUEST['query'])) {
             $this->requeststr = $_REQUEST['query'];
@@ -69,13 +70,15 @@ class BaseController
     }
 
 
-    function indexAction()
-    {
+
+    function indexAction() {
 
     }
 
-    public function auth()
-    {
+
+
+    public function auth() {
+
         $this->identity = $_SESSION['identity'];
 
         if (!$this->identity->isLoggedIn()) {

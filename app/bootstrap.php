@@ -1,5 +1,10 @@
 <?php
 
+
+
+spl_autoload_extensions(".php");
+spl_autoload_register();
+
 /* BOOTSTRAP OF APPLICATION FRAMEWORK */
 
 // if possibe increase memory limit
@@ -17,11 +22,11 @@ if (isset($_REQUEST['GLOBALS']) )
 
 
 require dirname(__FILE__).'/config.php';
-require dirname(__FILE__).'/vendor/autoload.php';
+//require __DIR__.'/doctrine.php';
+
 
 
 function autoload($name) {
-
 	if(file_exists($file = CONTROLLER.'/'.ucfirst($name).'.php')) {
 		include_once $file;
 
@@ -32,15 +37,18 @@ function autoload($name) {
 		include_once $file;
 	}
 }
-spl_autoload_register('autoload');
+//spl_autoload_register('autoload');
+
 
 
 if(!isset($_SESSION)) session_start();
+
 if(isset($_GET['reset'])) session_destroy();
 
-// initialise PDO database
-Dba::factory((DB_TYPE.':host='.DB_HOST.'; dbname='.DB_NAME), DB_USER, DB_PASS);
 
+
+// initialise PDO database
+\app\library\Dba::factory((DB_TYPE.':host='.DB_HOST.'; dbname='.DB_NAME), DB_USER, DB_PASS);
 
 
 function bootstrap() {

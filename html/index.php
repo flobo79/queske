@@ -7,5 +7,5 @@
  * - Framework is following MCV pattern
  * - Libraries to be found in app/Library
  */
-require('app/bootstrap.php');
+require('../app/bootstrap.php');
 bootstrap();
