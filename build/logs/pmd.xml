@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<pmd version="1.5.0" timestamp="2013-11-27T15:58:01+01:00">
+  <file name="/Users/flobo/Webserver/queske/app/library/Files.php">
+    <violation beginline="11" endline="34" rule="CyclomaticComplexity" ruleset="Code Size Rules" package="+global" externalInfoUrl="http://phpmd.org/rules/codesize.html#cyclomaticcomplexity" class="Files" method="deleteFolder" priority="3">
+      The method deleteFolder() has a Cyclomatic Complexity of 11. The configured cyclomatic complexity threshold is 10.
+    </violation>
+  </file>
+  <file name="/Users/flobo/Webserver/queske/app/mvc/controller/AdminController.php">
+    <violation beginline="17" endline="77" rule="CyclomaticComplexity" ruleset="Code Size Rules" package="+global" externalInfoUrl="http://phpmd.org/rules/codesize.html#cyclomaticcomplexity" class="AdminController" method="indexAction" priority="3">
+      The method indexAction() has a Cyclomatic Complexity of 11. The configured cyclomatic complexity threshold is 10.
+    </violation>
+  </file>
+  <file name="/Users/flobo/Webserver/queske/app/vendor/composer/ClassLoader.php">
+    <violation beginline="198" endline="245" rule="CyclomaticComplexity" ruleset="Code Size Rules" package="Composer\Autoload" externalInfoUrl="http://phpmd.org/rules/codesize.html#cyclomaticcomplexity" class="ClassLoader" method="findFile" priority="3">
+      The method findFile() has a Cyclomatic Complexity of 13. The configured cyclomatic complexity threshold is 10.
+    </violation>
+  </file>
+</pmd>

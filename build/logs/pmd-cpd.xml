@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd-cpd>
+  <duplication lines="71" tokens="149">
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Answer.php" line="13"/>
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Category.php" line="9"/>
+    <codefragment>      function Question ($id=false) {
+          $this-&gt;BaseModel($this-&gt;table);
+          $this-&gt;db = $this-&gt;getDB(); 
+          if($id) {
+              return $this-&gt;load($id);
+          }
+      }
+
+
+    function load($id) {
+        if($data = $this-&gt;get($id)) {
+            foreach($data as $k =&gt; $v) {
+                $this-&gt;$k = $v;
+            }
+            return $this;
+        }
+
+        return false;
+    }    
+    
+    function create ($title, $user_id, $filename, $file, $url = '') {
+        if(!file_exists($file)) {
+            die("could not create ".$this-&gt;table.", file $file doenst exist");
+        }
+
+        // PREPARE DATA
+        $data = array(
+            'title' =&gt; $title,
+            'filename' =&gt; $this-&gt;_sanitzeString(basename($filename)),
+            'user_id' =&gt; $user_id,
+            'created' =&gt; time(),
+            'url' =&gt; $url
+        );
+
+        // SAVE BOOK TO DATABASE
+        $this-&gt;db-&gt;insert($this-&gt;table, $data);
+        if($this-&gt;id = $this-&gt;db-&gt;lastInsertId()) {
+            $this-&gt;load($this-&gt;id);
+        } else {
+            die("could not save book to database");
+        }
+
+
+        
+        return $this;
+    }
+    
+    
+    /**
+     * deletes a book and its files
+     *
+     * @return bool
+     */
+    public function trash() {
+        if(!$this-&gt;id) die('book not loaded');
+
+        if($this-&gt;delete($this-&gt;id)) {
+            Files::deleteFolder(dirname(BASEDIR).'/books/'.$this-&gt;getBookFolder());
+        }
+        return true;
+    }
+
+    
+
+    public function getId() {
+        return $this-&gt;id;
+    }
+
+    public function getUserId() {
+        return $this-&gt;user_id;
+    }
+</codefragment>
+  </duplication>
+  <duplication lines="80" tokens="175">
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Answer.php" line="3"/>
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Question.php" line="3"/>
+    <codefragment>class Question extends BaseModel {
+
+    public $id;
+      protected $table = 'questions';
+    public $question;
+    public $question2;
+    public $survey_id;
+    public $order;
+    public $type;
+    
+      function Question ($id=false) {
+          $this-&gt;BaseModel($this-&gt;table);
+          $this-&gt;db = $this-&gt;getDB(); 
+          if($id) {
+              return $this-&gt;load($id);
+          }
+      }
+
+
+    function load($id) {
+        if($data = $this-&gt;get($id)) {
+            foreach($data as $k =&gt; $v) {
+                $this-&gt;$k = $v;
+            }
+            return $this;
+        }
+
+        return false;
+    }    
+    
+    function create ($title, $user_id, $filename, $file, $url = '') {
+        if(!file_exists($file)) {
+            die("could not create ".$this-&gt;table.", file $file doenst exist");
+        }
+
+        // PREPARE DATA
+        $data = array(
+            'title' =&gt; $title,
+            'filename' =&gt; $this-&gt;_sanitzeString(basename($filename)),
+            'user_id' =&gt; $user_id,
+            'created' =&gt; time(),
+            'url' =&gt; $url
+        );
+
+        // SAVE BOOK TO DATABASE
+        $this-&gt;db-&gt;insert($this-&gt;table, $data);
+        if($this-&gt;id = $this-&gt;db-&gt;lastInsertId()) {
+            $this-&gt;load($this-&gt;id);
+        } else {
+            die("could not save book to database");
+        }
+
+
+        
+        return $this;
+    }
+    
+    
+    /**
+     * deletes a book and its files
+     *
+     * @return bool
+     */
+    public function trash() {
+        if(!$this-&gt;id) die('book not loaded');
+
+        if($this-&gt;delete($this-&gt;id)) {
+            Files::deleteFolder(dirname(BASEDIR).'/books/'.$this-&gt;getBookFolder());
+        }
+        return true;
+    }
+
+    
+
+    public function getId() {
+        return $this-&gt;id;
+    }
+
+    public function getUserId() {
+        return $this-&gt;user_id;
+</codefragment>
+  </duplication>
+  <duplication lines="72" tokens="120">
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Questionnaire.php" line="18"/>
+    <file path="/Users/flobo/Webserver/queske/app/mvc/model/Survey.php" line="21"/>
+    <codefragment>      function __construct ($id=false, $field=false) {
+          $this-&gt;BaseModel($this-&gt;table);
+          $this-&gt;db = $this-&gt;getDB();
+          if($id) {
+              return $this-&gt;load($id, $field);
+          }
+      }
+
+    
+    
+    function load($id, $field=false) {
+
+        if($data = $this-&gt;get($id, $field)) {
+          
+          //if($this-&gt;getIdentity()-&gt;isAdmin() || $data-&gt;user_id == $this-&gt;getIdentity()-&gt;getId()) {
+          
+            foreach($data as $k =&gt; $v) {
+                $this-&gt;$k = $v;
+            }
+
+            return $this;
+          /*
+          } else {
+            throw new Exception("Entity doesn't belong to user");
+          }
+          */
+        }
+
+        return false;
+    }
+
+
+    public function getQuestions() {
+        $questions = new Question();
+        $list = $questions-&gt;getAll("survey_id = ".$this-&gt;id." order by `order`");
+        
+        foreach($list as $e =&gt; $q) {
+          $list[$e] = new Question($q-&gt;id);
+        }
+        
+        return $list;
+    }
+        
+
+
+    /**
+     * deletes a survey and its attachments
+     *
+     * @return bool
+     */
+    public function trash() {
+        if(!$this-&gt;id) die('survey not loaded');
+        
+        foreach($this-&gt;getQuestions() as $q) {
+          $q-&gt;delete();
+        }
+        
+        
+        if($this-&gt;delete()) {
+            //
+        }
+        return true;
+    }
+
+
+    public function getId() {
+        return $this-&gt;id;
+    }
+    
+    
+    public function getUserId() {
+        return $this-&gt;user_id;
+</codefragment>
+  </duplication>
+</pmd-cpd>
