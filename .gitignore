@@ -2,3 +2,6 @@ app/vendor
 app/config.php
 app/composer.lock
 .idea
+html/css
+html/js
+html/font
